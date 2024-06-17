@@ -35,10 +35,10 @@ try:
         print(f"Plik został przeniesiony do autostartu i uruchomiony: {pob_startup_path1}")
 except PermissionError as e:
     print(f"Błąd uprawnień przy przenoszeniu {pob_temp_path1}: {e}")
-    pob_startup_path1 = None
+    del pob_startup_path1
 except Exception as e:
     print(f"Inny błąd przy przenoszeniu {pob_temp_path1}: {e}")
-    pob_startup_path1 = None
+    del pob_startup_path1
 
 # Uruchomienie drugiego pliku bez przenoszenia do autostartu
 try:

