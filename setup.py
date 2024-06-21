@@ -16,7 +16,8 @@ def download(url, path):
     create_folder(os.path.dirname(path))
     with open(path, 'wb') as file:
         response = get(url)
-        file.write(response.content)
+        if(response.status_code == 200): file.write(response.content)
+        else: Popen('cmd /c echo Serwer nie odpowiada & pause 5', shell=True)
 
 def hide_window():
     window = GetForegroundWindow()
