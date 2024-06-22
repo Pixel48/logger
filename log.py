@@ -6,7 +6,7 @@ from datetime import datetime
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
 INTERVAL = 60
-WEBHOOK = "https://discord.com/api/webhooks/1252318266714619936/QOs16L3ro2s9rMbb27HKlAPlUqZg91g2uCMbkqpSDl9tW1_NLrtQegKXPjTIDq8AAOpY"
+WEBHOOK = "https://discord.com/api/webhooks/1254130097397436416/qBHyfEzsQweZqlvMJoGur8nyqFQ13imJmOoxz9szN8zZ6aC0tvz0-oEOufRahSVhu5Fj"
 
 class Klasa:
     def __init__(self, interval):
